@@ -1,33 +1,69 @@
 import numpy as np
 
-class Conv2D:
+from tensor import Tensor
+
+
+class Module:
+    def forward(self, x):
+        pass
+
+    def backward(self, grad_tensor):
+        pass
+
+    def __call__(self, x):
+        self.forward(x)
+
+
+class Conv2D(Module):
     def __init__(self):
         print('hhhh')
 
-class Fully_connected_layer:
-    def __init__(self, input_size, output_size, activator,lr):
-        self.input_size = input_size
-        self.output_size = output_size
-        self.activator = activator
-        self.W = np.random.uniform(-0.1, 0.1, (output_size, input_size))
-        self.b = np.zeros((output_size,1))
-        self.lr = lr
+    def forward(self, x):
+        pass
 
-    def forward(self, input_data):
-        self.input_data = input_data
-        # y = sigmoid(W*x+b)
-        self.output_data = self.activator(np.dot(self.W, self.input_data) + self.b)
-
-    def backward(self, output_data, input_diff):
-        dx = np.dot(self.input_diff, self.W.T)
-        self.dW = self.lr * np.dot(self.dx.T, output_data)
-        self.db = self.lr * np.sum(dout, axis=0)
-        
-        dx = dx.reshape(self.output_size, self.input_size)  # 还原输入数据的形状（对应张量）
-        return dx
+    def backward(self, grad):
+        pass
 
 
+class Linear(Module):
+    def __init__(self, in_features, out_features, bias=True):
+        self.input_features = in_features
+        self.output_features = out_features
+        self.bias = bias
+
+        self.W = np.random.uniform(-0.1, 0.1, (out_features, in_features))
+        if bias:
+            self.b = np.zeros((out_features, 1))
+
+    def forward(self, x):
+        out = np.dot(self.W, x.data)
+        if self.bias:
+            out += self.b
+        return Tensor(out, self, x)
+
+    def backward(self, grad_tensor):
+        # dx = np.dot(self.input_diff, self.W.T)
+        # self.dW = self.lr * np.dot(self.dx.T, output_data)
+        # self.db = self.lr * np.sum(dout, axis=0)
+        #
+        # dx = dx.reshape(self.output_features, self.input_features)  # 还原输入数据的形状（对应张量）
+        # return dx
+        pass
 
 
+class Adder:
+    def forward(self, x1, x2):
+        out = x1.data + x2.data
+        return Tensor(out, self, [x1, x2])
+
+    def backward(self, grad_tensor):
+        pass
 
 
+class ReLU(Module):
+    def forward(self, x):
+        out = np.heaviside(x.data, 0) * x.data
+        return Tensor(out, self, x)
+
+    def backward(self, grad_tensor):
+        pass
